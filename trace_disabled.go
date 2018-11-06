@@ -4,6 +4,6 @@
 
 // +build !memory.trace
 
-package memory
+package memory // import "modernc.org/memory"
 
 const trace = false

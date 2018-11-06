@@ -14,7 +14,7 @@
 //
 //  goos: linux
 //  goarch: amd64
-//  pkg: github.com/cznic/memory
+//  pkg: modernc.org/memory
 //  BenchmarkFree16-4           	100000000	        15.3 ns/op	       0 B/op	       0 allocs/op
 //  BenchmarkFree32-4           	100000000	        21.3 ns/op	       0 B/op	       0 allocs/op
 //  BenchmarkFree64-4           	50000000	        35.9 ns/op	       0 B/op	       0 allocs/op
@@ -37,8 +37,8 @@
 //  BenchmarkUnsafeMalloc32-4   	100000000	        14.2 ns/op	       0 B/op	       0 allocs/op
 //  BenchmarkUnsafeMalloc64-4   	100000000	        14.0 ns/op	       0 B/op	       0 allocs/op
 //  PASS
-//  ok  	github.com/cznic/memory	229.054s
-package memory
+//  ok  	modernc.org/memory	229.054s
+package memory // import "modernc.org/memory"
 
 import (
 	"fmt"
@@ -46,7 +46,7 @@ import (
 	"reflect"
 	"unsafe"
 
-	"github.com/cznic/mathutil"
+	"modernc.org/mathutil"
 )
 
 const mallocAllign = 16 // Must be >= 16

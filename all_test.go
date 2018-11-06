@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package memory
+package memory // import "modernc.org/memory"
 
 import (
 	"bytes"
@@ -15,7 +15,7 @@ import (
 	"testing"
 	"unsafe"
 
-	"github.com/cznic/mathutil"
+	"modernc.org/mathutil"
 )
 
 func caller(s string, va ...interface{}) {

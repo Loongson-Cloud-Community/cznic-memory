@@ -4,6 +4,6 @@
 
 // +build 386 arm armbe mips mipsle ppc ppc64le s390 s390x sparc
 
-package memory
+package memory // import "modernc.org/memory"
 
 type rawmem [1<<31 - 1]byte

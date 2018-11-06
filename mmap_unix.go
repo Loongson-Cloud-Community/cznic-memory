@@ -6,7 +6,7 @@
 
 // Modifications (c) 2017 The Memory Authors.
 
-package memory
+package memory // import "modernc.org/memory"
 
 import (
 	"syscall"
