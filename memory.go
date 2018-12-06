@@ -17,78 +17,46 @@
 // Benchmarks
 //
 //
-// Intel® Xeon(R) CPU E5-1650 v2 @ 3.50GHz × 12
-//
-//  ==== jnml@e5-1650:~/src/modernc.org/memory> date ; go version ; go test -run @ -bench . -benchmem |& tee log
-//  Thu Dec  6 10:38:35 CET 2018
-//  go version go1.11.2 linux/amd64
-//  goos: linux
-//  goarch: amd64
-//  pkg: modernc.org/memory
-//  BenchmarkFree16-12             	100000000	        17.0 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkFree32-12             	50000000	        24.4 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkFree64-12             	50000000	        38.9 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkCalloc16-12           	50000000	        33.3 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkCalloc32-12           	30000000	        40.1 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkCalloc64-12           	30000000	        45.7 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkGoCalloc16-12         	50000000	        26.3 ns/op	      16 B/op	       1 allocs/op
-//  BenchmarkGoCalloc32-12         	50000000	        27.3 ns/op	      32 B/op	       1 allocs/op
-//  BenchmarkGoCalloc64-12         	30000000	        35.1 ns/op	      64 B/op	       1 allocs/op
-//  BenchmarkMalloc16-12           	100000000	        20.1 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkMalloc32-12           	100000000	        20.0 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkMalloc64-12           	100000000	        20.2 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrFree16-12      	100000000	        14.9 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrFree32-12      	100000000	        22.1 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrFree64-12      	50000000	        36.9 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrCalloc16-12    	50000000	        26.5 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrCalloc32-12    	50000000	        33.3 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrCalloc64-12    	30000000	        38.5 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrMalloc16-12    	100000000	        14.8 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrMalloc32-12    	100000000	        15.0 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrMalloc64-12    	100000000	        15.2 ns/op	       0 B/op	       0 allocs/op
-//  PASS
-//  ok  	modernc.org/memory	65.940s
 //
 // Intel® Core™ i5-4670 CPU @ 3.40GHz × 4
 //
 //  ==== jnml@4670:~/src/modernc.org/memory> date ; go version ; go test -run @ -bench . -benchmem |& tee log
-//  Thu Dec  6 18:05:14 CET 2018
+//  Thu Dec  6 22:58:17 CET 2018
 //  go version go1.11.2 linux/amd64
 //  goos: linux
 //  goarch: amd64
 //  pkg: modernc.org/memory
-//  BenchmarkFree16-4            	100000000	        14.5 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkFree32-4            	100000000	        19.9 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkFree64-4            	50000000	        31.4 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkCalloc16-4          	50000000	        29.8 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkCalloc32-4          	50000000	        37.8 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkCalloc64-4          	30000000	        41.9 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkGoCalloc16-4        	50000000	        26.4 ns/op	      16 B/op	       1 allocs/op
-//  BenchmarkGoCalloc32-4        	50000000	        26.9 ns/op	      32 B/op	       1 allocs/op
-//  BenchmarkGoCalloc64-4        	30000000	        37.6 ns/op	      64 B/op	       1 allocs/op
-//  BenchmarkMalloc16-4          	100000000	        19.2 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkMalloc32-4          	100000000	        19.3 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkMalloc64-4          	100000000	        19.8 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrFree16-4     	100000000	        12.5 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrFree32-4     	100000000	        18.2 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrFree64-4     	50000000	        29.5 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrCalloc16-4   	50000000	        23.9 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrCalloc32-4   	50000000	        29.1 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrCalloc64-4   	50000000	        35.3 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrMalloc16-4   	100000000	        13.3 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrMalloc32-4   	100000000	        13.2 ns/op	       0 B/op	       0 allocs/op
-//  BenchmarkUintptrMalloc64-4   	100000000	        13.4 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkFree16-4            	100000000	        14.8 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkFree32-4            	100000000	        20.3 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkFree64-4            	50000000	        31.7 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkCalloc16-4          	50000000	        24.7 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkCalloc32-4          	50000000	        30.5 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkCalloc64-4          	50000000	        36.4 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkGoCalloc16-4        	50000000	        26.6 ns/op	      16 B/op	       1 allocs/op
+//  BenchmarkGoCalloc32-4        	50000000	        26.7 ns/op	      32 B/op	       1 allocs/op
+//  BenchmarkGoCalloc64-4        	50000000	        33.6 ns/op	      64 B/op	       1 allocs/op
+//  BenchmarkMalloc16-4          	100000000	        13.9 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkMalloc32-4          	100000000	        13.7 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkMalloc64-4          	100000000	        14.2 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrFree16-4     	100000000	        12.1 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrFree32-4     	100000000	        17.5 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrFree64-4     	50000000	        29.0 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrCalloc16-4   	100000000	        19.0 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrCalloc32-4   	50000000	        24.0 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrCalloc64-4   	50000000	        30.8 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrMalloc16-4   	200000000	         8.15 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrMalloc32-4   	200000000	         8.13 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrMalloc64-4   	200000000	         8.28 ns/op	       0 B/op	       0 allocs/op
 //  PASS
-//  ok  	modernc.org/memory	61.493s
+//  ok  	modernc.org/memory	74.453s
 package memory // import "modernc.org/memory"
 
 import (
 	"fmt"
+	"math/bits"
 	"os"
 	"reflect"
 	"unsafe"
-
-	"modernc.org/mathutil"
 )
 
 const mallocAllign = 16 // Must be >= 16
@@ -264,7 +232,7 @@ func (a *Allocator) UintptrMalloc(size int) (r uintptr, err error) {
 	}
 
 	a.allocs++
-	log := uint(mathutil.BitLen(roundup(size, mallocAllign) - 1))
+	log := uint(bits.Len(uint(roundup(size, mallocAllign) - 1)))
 	if 1<<log > maxSlotSize {
 		p, err := a.newPage(size)
 		if err != nil {
