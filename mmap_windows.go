@@ -18,9 +18,9 @@ const (
 	_PAGE_NOACCESS  = 0x0001
 )
 
-var (
-	pageSize = 1 << 16
+const pageSizeLog = 16
 
+var (
 	modkernel32      = syscall.NewLazyDLL("kernel32.dll")
 	procVirtualAlloc = modkernel32.NewProc("VirtualAlloc")
 	procVirtualFree  = modkernel32.NewProc("VirtualFree")

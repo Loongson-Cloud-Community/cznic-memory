@@ -16,6 +16,8 @@ all: editor
 	gosimple || true
 	maligned || true
 	unconvert -apply
+	grep -n 'FAIL\|PASS' log
+	date
 
 clean:
 	go clean
@@ -33,9 +35,11 @@ edit:
 
 editor:
 	gofmt -l -s -w *.go
+	GOOS=linux GOARCH=386 go build
+	GOOS=linux GOARCH=amd64 go build
+	GOOS=windows GOARCH=386 go build
+	GOOS=windows GOARCH=amd64 go build
 	go test -i
-	GOARCH=386 go build
-	GOARCH=amd64 go build
 	go test 2>&1 | tee log
 
 internalError:

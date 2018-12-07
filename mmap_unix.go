@@ -9,11 +9,17 @@
 package memory // import "modernc.org/memory"
 
 import (
+	"os"
 	"syscall"
 	"unsafe"
 )
 
-var pageSize = 1 << 20
+const pageSizeLog = 20
+
+var (
+	osPageMask = osPageSize - 1
+	osPageSize = os.Getpagesize()
+)
 
 func unmap(addr uintptr, size int) error {
 	_, _, errno := syscall.Syscall(syscall.SYS_MUNMAP, addr, uintptr(size), 0)
