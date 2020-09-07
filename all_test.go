@@ -96,7 +96,9 @@ func test1u(t *testing.T, max int) {
 			*(*byte)(unsafe.Pointer(p + uintptr(i))) = byte(vrng.Next())
 		}
 	}
-	t.Logf("allocs %v, mmaps %v, bytes %v, overhead %v (%.2f%%).", alloc.allocs, alloc.mmaps, alloc.bytes, alloc.bytes-quota, 100*float64(alloc.bytes-quota)/quota)
+	if counters {
+		t.Logf("allocs %v, mmaps %v, bytes %v, overhead %v (%.2f%%).", alloc.Allocs, alloc.Mmaps, alloc.Bytes, alloc.Bytes-quota, 100*float64(alloc.Bytes-quota)/quota)
+	}
 	srng.Seek(0)
 	vrng.Seek(0)
 	// Verify
@@ -129,7 +131,7 @@ func test1u(t *testing.T, max int) {
 			t.Fatal(err)
 		}
 	}
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		t.Fatalf("%+v", alloc)
 	}
 }
@@ -165,7 +167,9 @@ func test2u(t *testing.T, max int) {
 			*(*byte)(unsafe.Pointer(p + uintptr(i))) = byte(vrng.Next())
 		}
 	}
-	t.Logf("allocs %v, mmaps %v, bytes %v, overhead %v (%.2f%%).", alloc.allocs, alloc.mmaps, alloc.bytes, alloc.bytes-quota, 100*float64(alloc.bytes-quota)/quota)
+	if counters {
+		t.Logf("allocs %v, mmaps %v, bytes %v, overhead %v (%.2f%%).", alloc.Allocs, alloc.Mmaps, alloc.Bytes, alloc.Bytes-quota, 100*float64(alloc.Bytes-quota)/quota)
+	}
 	srng.Seek(0)
 	vrng.Seek(0)
 	// Verify & free
@@ -190,7 +194,7 @@ func test2u(t *testing.T, max int) {
 			t.Fatal(err)
 		}
 	}
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		t.Fatalf("%+v", alloc)
 	}
 }
@@ -250,7 +254,9 @@ func test3u(t *testing.T, max int) {
 			}
 		}
 	}
-	t.Logf("allocs %v, mmaps %v, bytes %v, overhead %v (%.2f%%).", alloc.allocs, alloc.mmaps, alloc.bytes, alloc.bytes-quota, 100*float64(alloc.bytes-quota)/quota)
+	if counters {
+		t.Logf("allocs %v, mmaps %v, bytes %v, overhead %v (%.2f%%).", alloc.Allocs, alloc.Mmaps, alloc.Bytes, alloc.Bytes-quota, 100*float64(alloc.Bytes-quota)/quota)
+	}
 	for b, v := range m {
 		for i, v := range v {
 			if *(*byte)(unsafe.Pointer(b.p + uintptr(i))) != v {
@@ -267,7 +273,7 @@ func test3u(t *testing.T, max int) {
 		}
 		alloc.UintptrFree(b.p)
 	}
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		t.Fatalf("%+v", alloc)
 	}
 }
@@ -286,7 +292,7 @@ func TestUFree(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		t.Fatalf("%+v", alloc)
 	}
 }
@@ -307,7 +313,7 @@ func TestUMalloc(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		t.Fatalf("%+v", alloc)
 	}
 }
@@ -340,7 +346,9 @@ func test1(t *testing.T, max int) {
 			b[i] = byte(vrng.Next())
 		}
 	}
-	t.Logf("allocs %v, mmaps %v, bytes %v, overhead %v (%.2f%%).", alloc.allocs, alloc.mmaps, alloc.bytes, alloc.bytes-quota, 100*float64(alloc.bytes-quota)/quota)
+	if counters {
+		t.Logf("allocs %v, mmaps %v, bytes %v, overhead %v (%.2f%%).", alloc.Allocs, alloc.Mmaps, alloc.Bytes, alloc.Bytes-quota, 100*float64(alloc.Bytes-quota)/quota)
+	}
 	srng.Seek(0)
 	vrng.Seek(0)
 	// Verify
@@ -372,7 +380,7 @@ func test1(t *testing.T, max int) {
 			t.Fatal(err)
 		}
 	}
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		t.Fatalf("%+v", alloc)
 	}
 }
@@ -408,7 +416,9 @@ func test2(t *testing.T, max int) {
 			b[i] = byte(vrng.Next())
 		}
 	}
-	t.Logf("allocs %v, mmaps %v, bytes %v, overhead %v (%.2f%%).", alloc.allocs, alloc.mmaps, alloc.bytes, alloc.bytes-quota, 100*float64(alloc.bytes-quota)/quota)
+	if counters {
+		t.Logf("allocs %v, mmaps %v, bytes %v, overhead %v (%.2f%%).", alloc.Allocs, alloc.Mmaps, alloc.Bytes, alloc.Bytes-quota, 100*float64(alloc.Bytes-quota)/quota)
+	}
 	srng.Seek(0)
 	vrng.Seek(0)
 	// Verify & free
@@ -432,7 +442,7 @@ func test2(t *testing.T, max int) {
 			t.Fatal(err)
 		}
 	}
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		t.Fatalf("%+v", alloc)
 	}
 }
@@ -489,7 +499,9 @@ func test3(t *testing.T, max int) {
 			}
 		}
 	}
-	t.Logf("allocs %v, mmaps %v, bytes %v, overhead %v (%.2f%%).", alloc.allocs, alloc.mmaps, alloc.bytes, alloc.bytes-quota, 100*float64(alloc.bytes-quota)/quota)
+	if counters {
+		t.Logf("allocs %v, mmaps %v, bytes %v, overhead %v (%.2f%%).", alloc.Allocs, alloc.Mmaps, alloc.Bytes, alloc.Bytes-quota, 100*float64(alloc.Bytes-quota)/quota)
+	}
 	for k, v := range m {
 		b := *k
 		if !bytes.Equal(b, v) {
@@ -505,7 +517,7 @@ func test3(t *testing.T, max int) {
 		}
 		alloc.Free(b)
 	}
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		t.Fatalf("%+v", alloc)
 	}
 }
@@ -524,7 +536,7 @@ func TestFree(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		t.Fatalf("%+v", alloc)
 	}
 }
@@ -545,7 +557,7 @@ func TestMalloc(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		t.Fatalf("%+v", alloc)
 	}
 }
@@ -566,7 +578,7 @@ func benchmarkFree(b *testing.B, size int) {
 		alloc.Free(b)
 	}
 	b.StopTimer()
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		b.Fatalf("%+v", alloc)
 	}
 }
@@ -591,7 +603,7 @@ func benchmarkCalloc(b *testing.B, size int) {
 	for _, b := range a {
 		alloc.Free(b)
 	}
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		b.Fatalf("%+v", alloc)
 	}
 }
@@ -630,7 +642,7 @@ func benchmarkMalloc(b *testing.B, size int) {
 	for _, b := range a {
 		alloc.Free(b)
 	}
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		b.Fatalf("%+v", alloc)
 	}
 }
@@ -655,7 +667,7 @@ func benchmarkUintptrFree(b *testing.B, size int) {
 		alloc.UintptrFree(p)
 	}
 	b.StopTimer()
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		b.Fatalf("%+v", alloc)
 	}
 }
@@ -680,7 +692,7 @@ func benchmarkUintptrCalloc(b *testing.B, size int) {
 	for _, p := range a {
 		alloc.UintptrFree(p)
 	}
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		b.Fatalf("%+v", alloc)
 	}
 }
@@ -705,7 +717,7 @@ func benchmarkUintptrMalloc(b *testing.B, size int) {
 	for _, p := range a {
 		alloc.UintptrFree(p)
 	}
-	if alloc.allocs != 0 || alloc.mmaps != 0 || alloc.bytes != 0 || len(alloc.regs) != 0 {
+	if alloc.Allocs != 0 || alloc.Mmaps != 0 || alloc.Bytes != 0 || len(alloc.regs) != 0 {
 		b.Fatalf("%+v", alloc)
 	}
 }

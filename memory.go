@@ -90,8 +90,8 @@ import (
 )
 
 const (
-	headerSize     = int(unsafe.Sizeof(page{}))
-	mallocAllign   = int(2 * unsafe.Sizeof(uintptr(0)))
+	headerSize     = unsafe.Sizeof(page{})
+	mallocAllign   = 2 * unsafe.Sizeof(uintptr(0))
 	maxSlotSize    = 1 << maxSlotSizeLog
 	maxSlotSizeLog = pageSizeLog - 2
 	pageAvail      = pageSize - headerSize
@@ -100,7 +100,7 @@ const (
 )
 
 func init() {
-	if int(unsafe.Sizeof(page{}))%mallocAllign != 0 {
+	if unsafe.Sizeof(page{})%mallocAllign != 0 {
 		panic("internal error")
 	}
 }
@@ -109,7 +109,7 @@ func init() {
 func roundup(n, m int) int { return (n + m - 1) &^ (m - 1) }
 
 type node struct {
-	prev, next *node
+	prev, next uintptr // *node
 }
 
 type page struct {
@@ -119,64 +119,69 @@ type page struct {
 	used int
 }
 
-// Allocator allocates and frees memory. Its zero value is ready for use.
+// Allocator allocates and frees memory. Its zero value is ready for use.  The
+// exported counters are updated only when build tag memory.counters is
+// present.
 type Allocator struct {
-	allocs int // # of allocs.
-	bytes  int // Asked from OS.
+	Allocs int // # of allocs.
+	Bytes  int // Asked from OS.
 	cap    [64]int
-	lists  [64]*node
-	mmaps  int // Asked from OS.
-	pages  [64]*page
-	regs   map[*page]struct{}
+	lists  [64]uintptr          // *node
+	Mmaps  int                  // Asked from OS.
+	pages  [64]uintptr          // *page
+	regs   map[uintptr]struct{} // map[*page]struct{}
 }
 
-func (a *Allocator) mmap(size int) (*page, error) {
+func (a *Allocator) mmap(size int) (uintptr /* *page */, error) {
 	p, size, err := mmap(size)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 
-	a.mmaps++
-	a.bytes += size
-	pg := (*page)(unsafe.Pointer(p))
+	if counters {
+		a.Mmaps++
+		a.Bytes += size
+	}
 	if a.regs == nil {
-		a.regs = map[*page]struct{}{}
+		a.regs = map[uintptr]struct{}{}
 	}
-	pg.size = size
-	a.regs[pg] = struct{}{}
-	return pg, nil
-}
-
-func (a *Allocator) newPage(size int) (*page, error) {
-	size += headerSize
-	p, err := a.mmap(size)
-	if err != nil {
-		return nil, err
-	}
-
-	p.log = 0
+	(*page)(unsafe.Pointer(p)).size = size
+	a.regs[p] = struct{}{}
 	return p, nil
 }
 
-func (a *Allocator) newSharedPage(log uint) (*page, error) {
-	if a.cap[log] == 0 {
-		a.cap[log] = pageAvail / (1 << log)
-	}
-	size := headerSize + a.cap[log]<<log
+func (a *Allocator) newPage(size int) (uintptr /* *page */, error) {
+	size += int(headerSize)
 	p, err := a.mmap(size)
 	if err != nil {
-		return nil, err
+		return 0, err
+	}
+
+	(*page)(unsafe.Pointer(p)).log = 0
+	return p, nil
+}
+
+func (a *Allocator) newSharedPage(log uint) (uintptr /* *page */, error) {
+	if a.cap[log] == 0 {
+		a.cap[log] = int(pageAvail) / (1 << log)
+	}
+	size := int(headerSize) + a.cap[log]<<log
+	p, err := a.mmap(size)
+	if err != nil {
+		return 0, err
 	}
 
 	a.pages[log] = p
-	p.log = log
+	(*page)(unsafe.Pointer(p)).log = log
 	return p, nil
 }
 
-func (a *Allocator) unmap(p *page) error {
+func (a *Allocator) unmap(p uintptr /* *page */) error {
 	delete(a.regs, p)
-	a.mmaps--
-	return unmap(uintptr(unsafe.Pointer(p)), p.size)
+	if counters {
+		a.Mmaps--
+	}
+	return unmap(p, (*page)(unsafe.Pointer(p)).size)
 }
 
 // UintptrCalloc is like Calloc except it returns an uintptr.
@@ -189,7 +194,7 @@ func (a *Allocator) UintptrCalloc(size int) (r uintptr, err error) {
 	if r, err = a.UintptrMalloc(size); r == 0 || err != nil {
 		return 0, err
 	}
-	b := ((*rawmem)(unsafe.Pointer(r)))[:size]
+	b := ((*rawmem)(unsafe.Pointer(r)))[:size:size]
 	for i := range b {
 		b[i] = 0
 	}
@@ -208,46 +213,53 @@ func (a *Allocator) UintptrFree(p uintptr) (err error) {
 		return nil
 	}
 
-	a.allocs--
-	pg := (*page)(unsafe.Pointer(p &^ uintptr(pageMask)))
-	log := pg.log
+	if counters {
+		a.Allocs--
+	}
+	pg := p &^ uintptr(pageMask)
+	log := (*page)(unsafe.Pointer(pg)).log
 	if log == 0 {
-		a.bytes -= pg.size
+		if counters {
+			a.Bytes -= (*page)(unsafe.Pointer(pg)).size
+		}
 		return a.unmap(pg)
 	}
 
-	n := (*node)(unsafe.Pointer(p))
-	n.prev = nil
-	n.next = a.lists[log]
-	if n.next != nil {
-		n.next.prev = n
+	(*node)(unsafe.Pointer(p)).prev = 0
+	(*node)(unsafe.Pointer(p)).next = a.lists[log]
+	if next := (*node)(unsafe.Pointer(p)).next; next != 0 {
+		(*node)(unsafe.Pointer(next)).prev = p
 	}
-	a.lists[log] = n
-	pg.used--
-	if pg.used != 0 {
+	a.lists[log] = p
+	(*page)(unsafe.Pointer(pg)).used--
+	if (*page)(unsafe.Pointer(pg)).used != 0 {
 		return nil
 	}
 
-	for i := 0; i < pg.brk; i++ {
-		n := (*node)(unsafe.Pointer(uintptr(unsafe.Pointer(pg)) + uintptr(headerSize+i<<log)))
+	for i := 0; i < (*page)(unsafe.Pointer(pg)).brk; i++ {
+		n := pg + headerSize + uintptr(i)<<log
+		next := (*node)(unsafe.Pointer(n)).next
+		prev := (*node)(unsafe.Pointer(n)).prev
 		switch {
-		case n.prev == nil:
-			a.lists[log] = n.next
-			if n.next != nil {
-				n.next.prev = nil
+		case prev == 0:
+			a.lists[log] = next
+			if next != 0 {
+				(*node)(unsafe.Pointer(next)).prev = 0
 			}
-		case n.next == nil:
-			n.prev.next = nil
+		case next == 0:
+			(*node)(unsafe.Pointer(prev)).next = 0
 		default:
-			n.prev.next = n.next
-			n.next.prev = n.prev
+			(*node)(unsafe.Pointer(prev)).next = next
+			(*node)(unsafe.Pointer(next)).prev = prev
 		}
 	}
 
 	if a.pages[log] == pg {
-		a.pages[log] = nil
+		a.pages[log] = 0
 	}
-	a.bytes -= pg.size
+	if counters {
+		a.Bytes -= (*page)(unsafe.Pointer(pg)).size
+	}
 	return a.unmap(pg)
 }
 
@@ -266,40 +278,42 @@ func (a *Allocator) UintptrMalloc(size int) (r uintptr, err error) {
 		return 0, nil
 	}
 
-	a.allocs++
-	log := uint(bits.Len(uint((size+mallocAllign-1)&^(mallocAllign-1) - 1)))
+	if counters {
+		a.Allocs++
+	}
+	log := uint(bits.Len(uint((size+int(mallocAllign)-1)&^int(mallocAllign-1) - 1)))
 	if log > maxSlotSizeLog {
 		p, err := a.newPage(size)
 		if err != nil {
 			return 0, err
 		}
 
-		return uintptr(unsafe.Pointer(p)) + uintptr(headerSize), nil
+		return p + headerSize, nil
 	}
 
-	if a.lists[log] == nil && a.pages[log] == nil {
+	if a.lists[log] == 0 && a.pages[log] == 0 {
 		if _, err := a.newSharedPage(log); err != nil {
 			return 0, err
 		}
 	}
 
-	if p := a.pages[log]; p != nil {
-		p.used++
-		p.brk++
-		if p.brk == a.cap[log] {
-			a.pages[log] = nil
+	if p := a.pages[log]; p != 0 {
+		(*page)(unsafe.Pointer(p)).used++
+		(*page)(unsafe.Pointer(p)).brk++
+		if (*page)(unsafe.Pointer(p)).brk == a.cap[log] {
+			a.pages[log] = 0
 		}
-		return uintptr(unsafe.Pointer(p)) + uintptr(headerSize+(p.brk-1)<<log), nil
+		return p + headerSize + uintptr((*page)(unsafe.Pointer(p)).brk-1)<<log, nil
 	}
 
 	n := a.lists[log]
-	p := (*page)(unsafe.Pointer(uintptr(unsafe.Pointer(n)) &^ uintptr(pageMask)))
-	a.lists[log] = n.next
-	if n.next != nil {
-		n.next.prev = nil
+	p := n &^ uintptr(pageMask)
+	a.lists[log] = (*node)(unsafe.Pointer(n)).next
+	if next := (*node)(unsafe.Pointer(n)).next; next != 0 {
+		(*node)(unsafe.Pointer(next)).prev = 0
 	}
-	p.used++
-	return uintptr(unsafe.Pointer(n)), nil
+	(*page)(unsafe.Pointer(p)).used++
+	return n, nil
 }
 
 // UintptrRealloc is like Realloc except its first argument is an uintptr,
@@ -330,7 +344,7 @@ func (a *Allocator) UintptrRealloc(p uintptr, size int) (r uintptr, err error) {
 	if us < size {
 		size = us
 	}
-	copy((*rawmem)(unsafe.Pointer(r))[:size], (*rawmem)(unsafe.Pointer(p))[:size])
+	copy((*rawmem)(unsafe.Pointer(r))[:size:size], (*rawmem)(unsafe.Pointer(p))[:size:size])
 	return r, a.UintptrFree(p)
 }
 
@@ -351,12 +365,12 @@ func UintptrUsableSize(p uintptr) (r int) {
 }
 
 func usableSize(p uintptr) (r int) {
-	pg := (*page)(unsafe.Pointer(p &^ uintptr(pageMask)))
-	if pg.log != 0 {
-		return 1 << pg.log
+	pg := p &^ uintptr(pageMask)
+	if log := (*page)(unsafe.Pointer(pg)).log; log != 0 {
+		return 1 << log
 	}
 
-	return pg.size - headerSize
+	return (*page)(unsafe.Pointer(pg)).size - int(headerSize)
 }
 
 // Calloc is like Malloc except the allocated memory is zeroed.

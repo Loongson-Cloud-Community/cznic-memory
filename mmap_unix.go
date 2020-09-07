@@ -51,7 +51,6 @@ func mmap(size int) (uintptr, int, error) {
 			return 0, 0, err
 		}
 
-		b = b[m:]
 		n -= m
 		p += uintptr(m)
 	}
