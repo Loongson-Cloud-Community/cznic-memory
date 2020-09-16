@@ -1,6 +1,6 @@
 module modernc.org/memory
 
-// +heroku goVersion go1.15
+// +heroku goVersion go1.14
 
 go 1.15
 
