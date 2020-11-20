@@ -16,6 +16,39 @@
 //
 // Benchmarks
 //
+// AMD Ryzen 9 3900X 12-Core Processor × 24 
+//
+//  jnml@3900x:~/src/modernc.org/memory$ date ; go version ; go test -run @ -bench . -benchmem |& tee log
+//  Fri Nov 20 17:23:04 CET 2020
+//  go version go1.15.5 linux/amd64
+//  goos: linux
+//  goarch: amd64
+//  pkg: modernc.org/memory
+//  BenchmarkFree16-24             	141188362	         8.26 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkFree32-24             	100000000	        11.4 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkFree64-24             	67160647	        18.3 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkCalloc16-24           	60612698	        19.8 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkCalloc32-24           	47968105	        23.8 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkCalloc64-24           	40752181	        28.6 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkGoCalloc16-24         	66487354	        17.8 ns/op	      16 B/op	       1 allocs/op
+//  BenchmarkGoCalloc32-24         	56009206	        21.2 ns/op	      32 B/op	       1 allocs/op
+//  BenchmarkGoCalloc64-24         	52086571	        23.4 ns/op	      64 B/op	       1 allocs/op
+//  BenchmarkMalloc16-24           	113943390	        10.2 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkMalloc32-24           	113520471	        10.2 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkMalloc64-24           	108787056	        10.7 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrFree16-24      	146110286	         7.94 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrFree32-24      	93052707	        12.0 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrFree64-24      	69805262	        17.3 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrCalloc16-24    	85282725	        13.7 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrCalloc32-24    	66489789	        17.9 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrCalloc64-24    	53561092	        22.7 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrMalloc16-24    	222978858	         5.28 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrMalloc32-24    	210443384	         5.30 ns/op	       0 B/op	       0 allocs/op
+//  BenchmarkUintptrMalloc64-24    	213706227	         5.47 ns/op	       0 B/op	       0 allocs/op
+//  PASS
+//  ok  	modernc.org/memory	70.528s
+//  jnml@3900x:~/src/modernc.org/memory$ 
+//
 // Intel® Core™ i5-4670 CPU @ 3.40GHz × 4
 //
 //  ==== jnml@4670:~/src/modernc.org/memory> date ; go version ; go test -run @ -bench . -benchmem |& tee log
