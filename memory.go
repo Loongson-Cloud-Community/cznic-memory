@@ -4,6 +4,10 @@
 
 // Package memory implements a memory allocator.
 //
+// Build status
+//
+// available at https://modern-c.appspot.com/-/builder/?importpath=modernc.org%2fb
+//
 // Changelog
 //
 // 2017-10-03 Added alternative, unsafe.Pointer-based API.
