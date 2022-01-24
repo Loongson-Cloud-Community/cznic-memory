@@ -34,7 +34,7 @@ func unmap(addr uintptr, size int) error {
 // pageSize aligned.
 func mmap(size int) (uintptr, int, error) {
 	size = roundup(size, osPageSize)
-	b, err := syscall.Mmap(-1, 0, size+pageSize, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED|syscall.MAP_ANON)
+	b, err := syscall.Mmap(-1, 0, size+pageSize, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_PRIVATE|syscall.MAP_ANON)
 	if err != nil {
 		return 0, 0, err
 	}
