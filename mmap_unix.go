@@ -12,7 +12,6 @@ package memory // import "modernc.org/memory"
 import (
 	"os"
 	"syscall"
-	"unsafe"
 )
 
 const pageSizeLog = 20
@@ -34,13 +33,13 @@ func unmap(addr uintptr, size int) error {
 // pageSize aligned.
 func mmap(size int) (uintptr, int, error) {
 	size = roundup(size, osPageSize)
-	b, err := syscall.Mmap(-1, 0, size+pageSize, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_PRIVATE|syscall.MAP_ANON)
-	if err != nil {
+	// Copied from https://cs.opensource.google/go/go/+/refs/tags/go1.17.8:src/syscall/zsyscall_linux_amd64.go;l=1575-1584
+	p, _, err := syscall.Syscall6(syscall.SYS_MMAP, 0, uintptr(size+pageSize), uintptr(syscall.PROT_READ|syscall.PROT_WRITE), uintptr(syscall.MAP_PRIVATE|syscall.MAP_ANON), ^uintptr(0) /* -1 */, 0)
+	if err != 0 {
 		return 0, 0, err
 	}
 
-	n := len(b)
-	p := uintptr(unsafe.Pointer(&b[0]))
+	n := size + pageSize
 	if p&uintptr(osPageMask) != 0 {
 		panic("internal error")
 	}
