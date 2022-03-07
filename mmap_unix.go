@@ -33,9 +33,13 @@ func unmap(addr uintptr, size int) error {
 // pageSize aligned.
 func mmap(size int) (uintptr, int, error) {
 	size = roundup(size, osPageSize)
-	// Copied from https://cs.opensource.google/go/go/+/refs/tags/go1.17.8:src/syscall/zsyscall_linux_amd64.go;l=1575-1584
-	p, _, err := syscall.Syscall6(syscall.SYS_MMAP, 0, uintptr(size+pageSize), uintptr(syscall.PROT_READ|syscall.PROT_WRITE), uintptr(syscall.MAP_PRIVATE|syscall.MAP_ANON), ^uintptr(0) /* -1 */, 0)
-	if err != 0 {
+	// The actual mmap syscall varies by architecture. mmapSyscall provides same
+	// functionality as the unexported funtion syscall.mmap and is declared in
+	// mmap_*_*.go and mmap_fallback.go. To add support for a new architecture,
+	// check function mmap in src/syscall/syscall_*_*.go or
+	// src/syscall/zsyscall_*_*.go in Go's source code.
+	p, err := mmapSyscall(0, uintptr(size+pageSize), syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_PRIVATE|syscall.MAP_ANON, -1, 0)
+	if err != nil {
 		return 0, 0, err
 	}
 
