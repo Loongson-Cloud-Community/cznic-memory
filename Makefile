@@ -51,6 +51,7 @@ editor:
 	GOOS=netbsd GOARCH=amd64 go build
 	GOOS=openbsd GOARCH=386 go build
 	GOOS=openbsd GOARCH=amd64 go build
+	GOOS=openbsd GOARCH=arm64 go build
 	GOOS=windows GOARCH=386 go build
 	GOOS=windows GOARCH=amd64 go build
 
