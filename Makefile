@@ -50,6 +50,7 @@ editor:
 	GOOS=linux GOARCH=s390x go build
 	GOOS=netbsd GOARCH=386 go build
 	GOOS=netbsd GOARCH=amd64 go build
+	GOOS=netbsd GOARCH=arm go build
 	GOOS=openbsd GOARCH=386 go build
 	GOOS=openbsd GOARCH=amd64 go build
 	GOOS=openbsd GOARCH=arm64 go build
